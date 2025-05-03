@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  overflow-x: hidden;
+}
+
+[data-placeholder] {
+  color: #111827;
+  font-weight: 500;
+}
