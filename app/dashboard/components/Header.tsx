@@ -24,7 +24,7 @@ export default function AdminHeader({ currentPage }: AdminHeaderProps) {
 
 
     return (
-        <div className="w-full h-[2vh] flex justify-between px-4 py-2">
+        <div className="w-full h-fit flex justify-between px-4 py-2 bg-gray-50 border border-slate-200 items-center">
             <div className="font-semibold text-slate-900">
                 {currentPage}
             </div>

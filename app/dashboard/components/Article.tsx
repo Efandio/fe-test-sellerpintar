@@ -1,16 +1,163 @@
+'use client'
 
-
+import { useEffect, useState } from "react";
 import AdminHeader from "./Header";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, ImagePlus, Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useForm, SubmitHandler } from "react-hook-form";
+import Image from "next/image";
+import { Editor, EditorState, RichUtils } from 'draft-js'
+import { stateToHTML } from 'draft-js-export-html'
 
+interface IFormInput {
+    file?: File; 
+    content: string; // <- buat nampung hasil HTML dari draftjs
+}
 
 export default function AdminArticlePage() {
+    const [page, setPage] = useState<'main' | 'Add Article' | 'Edit Article' | 'Delete Article'>('main');
+    const { register, handleSubmit, setValue } = useForm<IFormInput>();
+    const [preview, setPreview] = useState<string | null>(null);
+    const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+    const handlePageChange = (change: 'main' | 'Add Article' | 'Edit Article' | 'Delete Article') => {
+        setPage(change);
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files ? e.target.files[0] : null;
+        if (selectedFile) {
+            const objectUrl = URL.createObjectURL(selectedFile);
+            setPreview(objectUrl);
+            setValue('file', selectedFile); // connect ke react-hook-form
+        }
+    };
+
+    // update content setiap editorState berubah
+    useEffect(() => {
+        const html = stateToHTML(editorState.getCurrentContent());
+        setValue('content', html);
+    }, [editorState, setValue]);
+
+    const onSubmit: SubmitHandler<IFormInput> = (data) => {
+        console.log("form data", data);
+        if (data.file) {
+            console.log("Uploaded file:", data.file);
+        }
+        console.log("Editor content (HTML):", data.content);
+    };
+
+    const handleBold = () => {
+        setEditorState(RichUtils.toggleInlineStyle(editorState, 'BOLD'));
+      };
+      
+      const handleItalic = () => {
+        setEditorState(RichUtils.toggleInlineStyle(editorState, 'ITALIC'));
+      };
+
+      const handleUndo = () => {
+        setEditorState(EditorState.undo(editorState));
+      };
+      
+      const handleRedo = () => {
+        setEditorState(EditorState.redo(editorState));
+      };
+
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-screen flex flex-col items-center">
             <AdminHeader currentPage={"Article"} />
             
-            <section>
+            {page === 'main' && (
+                <section className="bg-gray-50 w-[80vw] h-[25vh] border border-slate-200 mt-10 rounded-lg flex flex-col">
+                    <div className="w-full border-b border-slate-200 h-[10vh] flex items-center px-4 text-sm font-medium">
+                        Total Articles:
+                    </div>
+                    <div className="w-full h-[15vh] px-4 flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <div>
+                                <Select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder='Category' />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="s">asa</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex items-center">
+                                <Search size={18} color="#94A3B8" className="absolute translate-x-2" />
+                                <Input placeholder="Search by title" className="pl-8" />
+                            </div>
+                        </div>
 
-            </section>
+                        <div>
+                            <Button onClick={() => handlePageChange('Add Article')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium">
+                                <Plus size={18} color="#F8FAFC" />
+                                Add Articles
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {page === 'Add Article' && (
+                <form // ✅ ganti jadi form supaya submit default
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="bg-gray-50 w-[80vw] h-auto border border-slate-200 mt-10 rounded-lg flex flex-col"
+                >
+                    <div className="w-fit h-fit">
+                        <Button onClick={() => handlePageChange('main')} className="bg-transparent hover:bg-transparent text-black" type="button">
+                            <ArrowLeft color="black" className="translate-y-0.5" />
+                            Create Articles
+                        </Button>
+                    </div>
+
+                    {/* --- Input File --- */}
+                    <div className="w-full px-4 flex flex-col gap-1 mt-10">
+                        <div className="text-sm font-medium">Thumbnails</div>
+                        <div className="w-[15vw] h-[25vh] bg-white border-[1.5] border-dashed border-slate-300 rounded-lg relative">
+                            <label className="w-full h-full flex flex-col cursor-pointer" htmlFor="files">
+                                {preview ? (
+                                    <Image src={preview} fill alt="Preview" />
+                                ) : (
+                                    <div className="w-full h-full flex flex-col gap-1 justify-center items-center">
+                                        <ImagePlus size={20} color="#64748B" />
+                                        <span className="w-fit text-slate-500 underline text-xs">Click to select files</span>
+                                        <span className="w-fit text-slate-500 text-xs">Support File Type : jpg or png</span>
+                                    </div>
+                                )}
+                                <Input 
+                                    id="files" 
+                                    type="file" 
+                                    className="hidden" 
+                                    {...register('file')} // ✅ tetap register
+                                    onChange={handleFileChange}
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* --- Editor --- */}
+                    <div className="w-full px-4 flex flex-col gap-1 mt-10">
+                        <div className="text-sm font-medium">Content</div>
+                        <div className="border border-slate-300 rounded-md p-2 min-h-[200px]">
+                            <Editor
+                                editorState={editorState}
+                                onChange={setEditorState}
+                            />
+                        </div>
+                    </div>
+
+                    {/* --- Submit --- */}
+                    <div className="w-full flex justify-center mt-4">
+                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                            Submit
+                        </Button>
+                    </div>
+                </form>
+            )}
         </div>
-    )
+    );
 }
