@@ -39,7 +39,7 @@ export default function LoginForm() {
                 route.push('/articles')
             }
         } else {
-            console.log('Salah woii')
+            console.log('Salah')
         }
 
     };

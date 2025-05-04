@@ -27,7 +27,7 @@ type RegisterSchema = z.infer<typeof RegisterSchema>
 
 export default function RegisterForm() {
 
-    const { register, handleSubmit, control,  formState: { errors } } = useForm({
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
         resolver: zodResolver(RegisterSchema)
     })
 
@@ -43,8 +43,6 @@ export default function RegisterForm() {
 
         //  if key: users doesnt exist, turn into empty array
         const users: UsersType[] = JSON.parse(localStorage.getItem('users') || '[]')
-
-        const user = users.find(u => u.username === data.username && u.password === data.password && u.roles === data.roles)
         
         // if key: users exist insert newUsers into array
         const addNewUsers = [...users, newUsers];
@@ -52,13 +50,19 @@ export default function RegisterForm() {
         // set to localStorage
         setUser(addNewUsers)
 
-        if (user) {
-            if (user.roles === 'Admin') {
-                router.push('/dashboard')
-            } else {
-                router.push('/articles')
-            }
+        localStorage.setItem('currentUser', JSON.stringify(newUsers));
+
+
+        if (data.roles === 'Admin') {
+            router.push('/dashboard');
+        } else if (data.roles === 'User') {
+            router.push('/articles');
         }
+
+        reset({
+            username: '',
+            password: '',
+        })
     }
 
     return (
