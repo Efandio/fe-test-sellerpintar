@@ -11,9 +11,10 @@ interface HeaderProps {
     blueLogoClassName: string;
     whiteLogoClassName: string;
     usernameClassName: string;
+    className?: string;
 }
 
-export default function Header({ blueLogo, whiteLogo, blueLogoClassName, whiteLogoClassName, usernameClassName }: HeaderProps ) {
+export default function Header({ blueLogo, whiteLogo, blueLogoClassName, whiteLogoClassName, usernameClassName, className }: HeaderProps ) {
 
     const [ username, setUsername ] = useState<string>('');
     const [ usernameFirstChar, setUsernameFirstChar ] = useState<string>('');
@@ -32,7 +33,7 @@ export default function Header({ blueLogo, whiteLogo, blueLogoClassName, whiteLo
 
 
     return (
-        <header className="z-50 w-full h-[8vh] flex items-center justify-between px-10 fixed bg-white md:bg-transparent md:py-10 md:px-18">
+        <header className={`z-50 w-full h-[8vh] flex items-center justify-between px-10 fixed bg-white md:bg-transparent md:py-10 md:px-18 ${className}`}>
             <div className="w-[35vw] md:w-[180px] lg:w-[134px] h-[80px] lg:h-[24px] relative">
                 <Image 
                     src={blueLogo}

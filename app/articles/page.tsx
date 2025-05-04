@@ -50,7 +50,8 @@ export default function ArticleList() {
     const totalPage = Math.ceil(displayedArticles.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const paginationArticles = displayedArticles.slice(startIndex, endIndex)
+
+    const paginationArticles = displayedArticles.slice(startIndex, endIndex);
 
 
     const filterByCategory = (category: string) => {
