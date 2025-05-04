@@ -11,6 +11,8 @@ import Image from "next/image";
 
 interface IFormInput {
     file?: File;
+    title: string;
+    category: string;
 }
 
 export default function AdminArticlePage() {
@@ -114,15 +116,19 @@ export default function AdminArticlePage() {
                                 />
                             </label>
                         </div>
+                        <div className="w-full">
+                                <label htmlFor="">Title</label>
+                                <Input placeholder="Title" />
+                        </div>
                     </div>
 
 
-                    {/* --- Submit --- */}
+                    {/* --- Submit ---
                     <div className="w-full flex justify-center mt-4">
-                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-                            Submit
+                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-slate-50">
+                            Upload
                         </Button>
-                    </div>
+                    </div> */}
                 </form>
             )}
         </div>
