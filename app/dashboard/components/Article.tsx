@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AdminHeader from "./Header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -8,19 +8,15 @@ import { ArrowLeft, ImagePlus, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
-import { Editor, EditorState, RichUtils } from 'draft-js'
-import { stateToHTML } from 'draft-js-export-html'
 
 interface IFormInput {
-    file?: File; 
-    content: string; // <- buat nampung hasil HTML dari draftjs
+    file?: File;
 }
 
 export default function AdminArticlePage() {
     const [page, setPage] = useState<'main' | 'Add Article' | 'Edit Article' | 'Delete Article'>('main');
     const { register, handleSubmit, setValue } = useForm<IFormInput>();
     const [preview, setPreview] = useState<string | null>(null);
-    const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
     const handlePageChange = (change: 'main' | 'Add Article' | 'Edit Article' | 'Delete Article') => {
         setPage(change);
@@ -31,39 +27,18 @@ export default function AdminArticlePage() {
         if (selectedFile) {
             const objectUrl = URL.createObjectURL(selectedFile);
             setPreview(objectUrl);
-            setValue('file', selectedFile); // connect ke react-hook-form
+            setValue('file', selectedFile); 
         }
     };
 
-    // update content setiap editorState berubah
-    useEffect(() => {
-        const html = stateToHTML(editorState.getCurrentContent());
-        setValue('content', html);
-    }, [editorState, setValue]);
 
     const onSubmit: SubmitHandler<IFormInput> = (data) => {
         console.log("form data", data);
         if (data.file) {
             console.log("Uploaded file:", data.file);
         }
-        console.log("Editor content (HTML):", data.content);
     };
 
-    const handleBold = () => {
-        setEditorState(RichUtils.toggleInlineStyle(editorState, 'BOLD'));
-      };
-      
-      const handleItalic = () => {
-        setEditorState(RichUtils.toggleInlineStyle(editorState, 'ITALIC'));
-      };
-
-      const handleUndo = () => {
-        setEditorState(EditorState.undo(editorState));
-      };
-      
-      const handleRedo = () => {
-        setEditorState(EditorState.redo(editorState));
-      };
 
     return (
         <div className="w-full h-screen flex flex-col items-center">
@@ -102,8 +77,10 @@ export default function AdminArticlePage() {
                 </section>
             )}
 
+            {/* ADD ARTICLES */}
+
             {page === 'Add Article' && (
-                <form // ✅ ganti jadi form supaya submit default
+                <form 
                     onSubmit={handleSubmit(onSubmit)}
                     className="bg-gray-50 w-[80vw] h-auto border border-slate-200 mt-10 rounded-lg flex flex-col"
                 >
@@ -132,23 +109,13 @@ export default function AdminArticlePage() {
                                     id="files" 
                                     type="file" 
                                     className="hidden" 
-                                    {...register('file')} // ✅ tetap register
+                                    {...register('file')} 
                                     onChange={handleFileChange}
                                 />
                             </label>
                         </div>
                     </div>
 
-                    {/* --- Editor --- */}
-                    <div className="w-full px-4 flex flex-col gap-1 mt-10">
-                        <div className="text-sm font-medium">Content</div>
-                        <div className="border border-slate-300 rounded-md p-2 min-h-[200px]">
-                            <Editor
-                                editorState={editorState}
-                                onChange={setEditorState}
-                            />
-                        </div>
-                    </div>
 
                     {/* --- Submit --- */}
                     <div className="w-full flex justify-center mt-4">
