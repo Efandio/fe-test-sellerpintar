@@ -1,9 +1,10 @@
+import AdminHeader from "./Header";
 
 
 export default function CategoryAdminPage() {
     return (
         <div>
-            category
+            <AdminHeader currentPage="Category" />
         </div>
     )
 }

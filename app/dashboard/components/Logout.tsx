@@ -1,9 +1,10 @@
+import AdminHeader from "./Header";
 
 
 export default function LogoutAdminPage() {
     return (
         <div>
-            logout
+            <AdminHeader currentPage="Logout" />
         </div>
     )
 }
