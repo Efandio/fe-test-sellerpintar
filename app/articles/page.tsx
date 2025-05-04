@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UsersType } from "@/types/UserType";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
@@ -12,51 +11,41 @@ import axios from "axios";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 
 type SearchInput = {
     query: string;
 }
 
 export default function ArticleList() {
-
-    const [ username, setUsername ] = useState<string | null>(null);
-    const [ firstUsernameChar, setFirstUsernameChar ] = useState<string | null>(null);
     const [ articles, setArticles ] = useState<ArticlesType[]>([]);
     const { register, handleSubmit } = useForm<SearchInput>();
     const [ displayedArticles, setDisplayedArticles ] = useState<ArticlesType[]>([]);
     const [ currentPage, setCurrentPage ] = useState(1);
     const [ itemsPerPage, setItemsPerPage ] = useState(3); // Default mobile render 3 articles
 
-    useEffect(() => {
-        const getStore = localStorage.getItem('currentUser') || '[]'
-
-        if (getStore) {
-            const currentUser: UsersType = JSON.parse(getStore);
-            setUsername(currentUser.username);
-            setFirstUsernameChar(currentUser.username[0])
-        }
-
-    }, [])
+    const router = useRouter();
     
     useEffect(() => {
         axios.get('https://test-fe.mysellerpintar.com/api/articles')
         .then(res => {
-            setArticles(res.data.data || [])
-            setDisplayedArticles(res.data.data || [])
-        })
+            setArticles(res.data.data || []);
+            setDisplayedArticles(res.data.data || []);
+        });
 
         const handleResize = () => {
             const isMobile = window.innerWidth >= 1080;
             setItemsPerPage(isMobile ? 9 : 3)
-        }
+        };
 
-        handleResize()
+        handleResize();
 
-        window.addEventListener('resize', handleResize)
+        window.addEventListener('resize', handleResize);
 
-        return () => removeEventListener('resize', handleResize)
+        return () => removeEventListener('resize', handleResize);
 
-    }, [])
+    }, []);
+
 
     const totalPage = Math.ceil(displayedArticles.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -78,6 +67,9 @@ export default function ArticleList() {
         searchArticle(data.query)
     }
 
+    const handleArticleDetails = (id: string) => {
+        router.push(`/articles/${id}`)
+    }
 
     return (
         <div className="w-screen h-screen relative">
@@ -90,10 +82,7 @@ export default function ArticleList() {
                 </div>
                 <div className="absolute bg-[#2563EBDB] w-screen h-[70vh]" />
 
-                <Header 
-                    username={username}
-                    usernameFirstChar={firstUsernameChar}
-                />
+                <Header blueLogo={"/authLogo.svg"} whiteLogo={"/Logo.svg"} blueLogoClassName={""} whiteLogoClassName={"hidden md:block"} usernameClassName={"text-white"} />
 
 {/* Filter Section */}
             <section id="articleList" className="w-full h-[75vh] relative flex flex-col justify-center items-center gap-10">
@@ -131,8 +120,8 @@ export default function ArticleList() {
 
                 <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 justify-items-center relative mt-10">
                     {paginationArticles.map((a, idx) => (
-                        <div key={idx} className="flex flex-col w-full h-[50vh] justify-between items-center">
-                            <div className="relative rounded-lg flex flex-col gap-2 w-[85vw] h-[30vh] md:w-[70vw] md:h-[30vh] lg:w-[25vw] lg:h-[25vh] bg-white border">
+                        <div onClick={() => handleArticleDetails(a.id)} key={idx} className="flex flex-col w-full h-[50vh] lg:h-[80vh] justify-between items-center">
+                            <div className="relative rounded-lg flex flex-col gap-2 w-[85vw] h-[30vh] md:w-[70vw] md:h-[30vh] lg:w-[25vw] lg:h-[35vh] bg-white border">
                                 {a.imageUrl ? (
                                     <Image 
                                     src={a.imageUrl}
@@ -144,7 +133,7 @@ export default function ArticleList() {
                                     <p>No Image</p>
                                 ) }
                             </div>
-                            <div className="flex flex-col gap-1 mt-4 w-[85vw] h-[30vh] md:w-[70vw] md:h-[0vh] lg:w-[25vw] lg:h-[25vh]">
+                            <div className="flex flex-col gap-1 mt-4 w-[85vw] h-[30vh] md:w-[70vw] md:h-[30vh] lg:w-[25vw] lg:h-[35vh]">
                                 <p className="text-xs text-slate-600">{new Date(a.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                 <h2 className="text-slate-900 font-semibold text-xl">{a.title}</h2>
                                 <p className="text-slate-600">{a.content.length >= 10 ? a.content.slice(0, 70) + '...' : a.content}</p>
@@ -157,7 +146,7 @@ export default function ArticleList() {
                 </div>
 
 
-                    <Pagination className="relative mt-95 md:mt-135 lg:mt-95">
+                    <Pagination className="relative mt-95 md:mt-135 lg:mt-[140vh]">
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} href={"#"}  />
