@@ -12,9 +12,10 @@ interface HeaderProps {
     whiteLogoClassName: string;
     usernameClassName: string;
     className?: string;
+    dashboardMenu?: string; 
 }
 
-export default function Header({ blueLogo, whiteLogo, blueLogoClassName, whiteLogoClassName, usernameClassName, className }: HeaderProps ) {
+export default function Header({ blueLogo, whiteLogo, blueLogoClassName, whiteLogoClassName, usernameClassName, className, dashboardMenu }: HeaderProps ) {
 
     const [ username, setUsername ] = useState<string>('');
     const [ usernameFirstChar, setUsernameFirstChar ] = useState<string>('');
@@ -47,6 +48,7 @@ export default function Header({ blueLogo, whiteLogo, blueLogoClassName, whiteLo
                     alt="Logo"
                     className={whiteLogoClassName}
                 />
+                <p>{dashboardMenu}</p>
             </div>
             <div onClick={() => alert('TES')} className="flex md:gap-2 items-center">
                 <span className="w-fit h-fit px-3 py-1 bg-blue-200 rounded-full text-blue-900 font-medium">
